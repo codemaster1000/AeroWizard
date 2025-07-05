@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Environment variables and secrets
+.env
+.env.*
+*.env
+firebase_setup/serviceAccountKey.json
+**/serviceAccountKey*.json
+**/credentials*.json
+**/*-key*.json
+**/*.pem
+**/*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Build/output directories
+dist/
+build/
+out/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.sublime*
+.history/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Debug files
+.node-version
+.node_repl_history
+.npm
+.eslintcache
