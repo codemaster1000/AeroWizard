@@ -1,10 +1,10 @@
 {
-    "name": "flight-tracker-bot",
+    "name": "flight_tracker_bot",
     "version": "1.0.0",
     "description": "Telegram bot for tracking flight prices",
     "main": "index.js",
     "engines": {
-        "node": "20"
+        "node": "22"
     },
     "scripts": {
         "start": "node index.js",
@@ -16,8 +16,8 @@
         "csv-parser": "^3.2.0",
         "dotenv": "^16.3.1",
         "express": "^4.21.2",
-        "firebase": "^9.22.0",
-        "firebase-admin": "^11.11.1",
+        "firebase": "^11.10.0",
+        "firebase-admin": "^13.4.0",
         "firebase-functions": "^6.3.2",
         "node-cron": "^3.0.3",
         "node-telegram-bot-api": "^0.64.0",

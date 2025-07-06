@@ -4,6 +4,7 @@ console.log('TELEGRAM_BOT_TOKEN is set:', !!process.env.TELEGRAM_BOT_TOKEN);
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const cron = require('node-cron');
+const setupCronEndpoints = require('./cron-endpoints');
 
 // Import our modules
 const FlightAPI = require('./services/flightAPI');
@@ -1461,6 +1462,7 @@ process.on('SIGTERM', () => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
+setupCronEndpoints(app, priceMonitor, flightTracker);
 app.listen(PORT, async () => {
     await initialize();
     console.log(`Flight tracker bot running on port ${PORT}`);
