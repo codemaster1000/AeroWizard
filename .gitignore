@@ -13,6 +13,7 @@ firebase_setup/serviceAccountKey.json
 **/*-key*.json
 **/*.pem
 **/*.key
+firebase-config-values.json
 
 # Logs
 logs/
