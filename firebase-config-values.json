@@ -1,0 +1,11 @@
+{
+    "telegram": {
+        "token": "8094739568:AAHPLrblWmEhSdLKLNTSfi7Ow4rFGfIuUy8",
+        "webhook": "https://flight-tracker-bot.web.app/webhook",
+        "username": "aerowizard_bot"
+    },
+    "amadeus": {
+        "key": "MgJtdAMGcixPoW2Ve3NFZhZRGjrZe8qx",
+        "secret": "a4qTJ6e5zAAmdA6h"
+    }
+}

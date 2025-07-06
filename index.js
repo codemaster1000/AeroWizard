@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const cron = require('node-cron');
@@ -8,6 +7,11 @@ const FlightAPI = require('./services/flightAPI');
 const FirebaseService = require('./services/database');
 const PriceMonitor = require('./services/priceMonitor');
 const FlightTracker = require('./services/flightTracker');
+const { config } = require('./config-helper');
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
+
 
 // Initialize Express app
 const app = express();
@@ -19,7 +23,7 @@ const userStates = new Map();
 // Initialize services
 const flightAPI = new FlightAPI();
 const firebaseService = new FirebaseService();
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: process.env.NODE_ENV !== 'production' });
+const bot = new TelegramBot(config.telegram.token, { polling: process.env.NODE_ENV !== 'production' });
 const priceMonitor = new PriceMonitor(bot, flightAPI, firebaseService, userStates);
 const flightTracker = new FlightTracker(bot, flightAPI, firebaseService, userStates);
 
@@ -1419,20 +1423,19 @@ bot.on('callback_query', async (callbackQuery) => {
 // Server Setup
 // ==========================================
 
-// Webhook endpoint
-app.post('/webhook', (req, res) => {
-    bot.processUpdate(req.body);
-    res.sendStatus(200);
-});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Set up webhook for production
+// Add webhook setup for production
 if (process.env.NODE_ENV === 'production') {
-    bot.setWebHook(`${process.env.WEBHOOK_URL}/webhook`);
+    app.post('/webhook', (req, res) => {
+        bot.processUpdate(req.body);
+        res.sendStatus(200);
+    });
+    bot.setWebHook(config.telegram.webhook);
 }
 
 // Schedule price monitoring
@@ -1465,3 +1468,8 @@ app.listen(PORT, async () => {
     console.log(`Flight tracker bot running on port ${PORT}`);
     console.log('Bot is ready to receive messages!');
 });
+
+
+module.exports = app;
+module.exports.priceMonitor = priceMonitor;
+module.exports.flightTracker = flightTracker;
