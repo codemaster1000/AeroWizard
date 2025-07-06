@@ -1,3 +1,6 @@
+require('dotenv').config();
+console.log('TELEGRAM_BOT_TOKEN is set:', !!process.env.TELEGRAM_BOT_TOKEN);
+
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const cron = require('node-cron');
@@ -7,11 +10,6 @@ const FlightAPI = require('./services/flightAPI');
 const FirebaseService = require('./services/database');
 const PriceMonitor = require('./services/priceMonitor');
 const FlightTracker = require('./services/flightTracker');
-const { config } = require('./config-helper');
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
-
 
 // Initialize Express app
 const app = express();
@@ -23,7 +21,7 @@ const userStates = new Map();
 // Initialize services
 const flightAPI = new FlightAPI();
 const firebaseService = new FirebaseService();
-const bot = new TelegramBot(config.telegram.token, { polling: process.env.NODE_ENV !== 'production' });
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: process.env.NODE_ENV !== 'production' });
 const priceMonitor = new PriceMonitor(bot, flightAPI, firebaseService, userStates);
 const flightTracker = new FlightTracker(bot, flightAPI, firebaseService, userStates);
 
@@ -1435,7 +1433,7 @@ if (process.env.NODE_ENV === 'production') {
         bot.processUpdate(req.body);
         res.sendStatus(200);
     });
-    bot.setWebHook(config.telegram.webhook);
+    bot.setWebHook(process.env.WEBHOOK_URL);
 }
 
 // Schedule price monitoring
