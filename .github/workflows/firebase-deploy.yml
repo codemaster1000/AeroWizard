@@ -1,0 +1,45 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches: [ main ]  # Change this if your default branch has a different name
+  workflow_dispatch:    # Allows manual triggering
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create Service Account Key file
+        run: |
+          mkdir -p ./firebase_setup
+          echo '${{ secrets.SERVICE_ACCOUNT_KEY }}' > ./firebase_setup/serviceAccountKey.json
+      
+      - name: Set Firebase Environment Config
+        run: |
+          npx firebase-tools functions:config:set telegram.token="${{ secrets.TELEGRAM_BOT_TOKEN }}" --token "${{ secrets.FIREBASE_TOKEN }}"
+          npx firebase-tools functions:config:set telegram.webhook="${{ secrets.TELEGRAM_WEBHOOK }}" --token "${{ secrets.FIREBASE_TOKEN }}"
+          npx firebase-tools functions:config:set telegram.username="${{ secrets.TELEGRAM_USERNAME }}" --token "${{ secrets.FIREBASE_TOKEN }}"
+          npx firebase-tools functions:config:set amadeus.key="${{ secrets.AMADEUS_API_KEY }}" --token "${{ secrets.FIREBASE_TOKEN }}"
+          npx firebase-tools functions:config:set amadeus.secret="${{ secrets.AMADEUS_API_SECRET }}" --token "${{ secrets.FIREBASE_TOKEN }}"
+      
+      - name: Deploy to Firebase
+        run: npx firebase-tools deploy --token "${{ secrets.FIREBASE_TOKEN }}"
+      
+      - name: Configure Telegram Webhook
+        run: |
+          curl -F "url=${{ secrets.TELEGRAM_WEBHOOK }}" https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/setWebhook
+      
+      - name: Verify Webhook Status
+        run: |
+          curl https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/getWebhookInfo
