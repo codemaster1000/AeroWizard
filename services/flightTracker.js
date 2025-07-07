@@ -113,9 +113,23 @@ class FlightTracker {
             const departureTime = departurePoint.departure?.timings?.[0]?.value || null;
             const arrivalTime = arrivalPoint.arrival?.timings?.[0]?.value || null;
 
-            // Extract other details
-            const terminal = arrivalPoint.arrival?.terminal || null;
-            const gate = arrivalPoint.arrival?.gate || null;
+            // Extract departure details - handle terminal and gate as possible objects
+            const departureTerminal = typeof departurePoint.departure?.terminal === 'object'
+                ? departurePoint.departure?.terminal?.value || departurePoint.departure?.terminal?.code
+                : departurePoint.departure?.terminal;
+
+            const departureGate = typeof departurePoint.departure?.gate === 'object'
+                ? departurePoint.departure?.gate?.value || departurePoint.departure?.gate?.code
+                : departurePoint.departure?.gate;
+
+            // Extract arrival details - handle terminal and gate as possible objects
+            const arrivalTerminal = typeof arrivalPoint.arrival?.terminal === 'object'
+                ? arrivalPoint.arrival?.terminal?.value || arrivalPoint.arrival?.terminal?.code
+                : arrivalPoint.arrival?.terminal;
+
+            const arrivalGate = typeof arrivalPoint.arrival?.gate === 'object'
+                ? arrivalPoint.arrival?.gate?.value || arrivalPoint.arrival?.gate?.code
+                : arrivalPoint.arrival?.gate;
 
             // Build status object
             return {
@@ -126,8 +140,10 @@ class FlightTracker {
                 scheduledArrivalTime: arrivalTime,
                 actualDepartureTime: departureTime, // In test API, these are the same
                 actualArrivalTime: arrivalTime, // In test API, these are the same
-                terminal: terminal,
-                gate: gate,
+                departureTerminal: departureTerminal,
+                departureGate: departureGate,
+                terminal: arrivalTerminal,  // Keep for backward compatibility
+                gate: arrivalGate,          // Keep for backward compatibility
                 status: "SCHEDULED", // Default for test API, real API would have more statuses
                 checked: new Date().toISOString()
             };
@@ -232,18 +248,36 @@ class FlightTracker {
             message += `Route: ${status.departureAirport} → ${status.arrivalAirport}\n`;
             message += `Date: ${track.date}\n\n`;
 
-            message += `🛫 Departure: ${departureTime} from ${status.departureAirport}\n`;
-            message += `🛬 Arrival: ${arrivalTime} at ${status.arrivalAirport}\n`;
+            // Departure information with departure terminal if available
+            message += `🛫 DEPARTURE:\n`;
+            message += `   Time: ${departureTime}\n`;
+            message += `   Airport: ${status.departureAirport}\n`;
+
+            // Add departure terminal/gate if available in the API response
+            if (status.departureTerminal) {
+                message += `   Terminal: ${status.departureTerminal}\n`;
+            }
+
+            if (status.departureGate) {
+                message += `   Gate: ${status.departureGate}\n`;
+            }
+
+            message += `\n`;
+
+            // Arrival information with terminal/gate
+            message += `🛬 ARRIVAL:\n`;
+            message += `   Time: ${arrivalTime}\n`;
+            message += `   Airport: ${status.arrivalAirport}\n`;
 
             if (status.terminal) {
-                message += `🏢 Terminal: ${status.terminal}\n`;
+                message += `   Terminal: ${status.terminal}\n`;
             }
 
             if (status.gate) {
-                message += `🚪 Gate: ${status.gate}\n`;
+                message += `   Gate: ${status.gate}\n`;
             }
 
-            message += `📊 Status: ${status.status}\n\n`;
+            message += `\n📊 Status: ${status.status}\n\n`;
 
             // Add cancel button
             const keyboard = {
