@@ -8,6 +8,7 @@ npm-debug.log
 .env.*
 *.env
 firebase_setup/serviceAccountKey.json
+src/firebase.js
 **/serviceAccountKey*.json
 **/credentials*.json
 **/*-key*.json
